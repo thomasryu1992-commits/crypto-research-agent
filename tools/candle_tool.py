@@ -4,7 +4,11 @@ from config import BINANCE_FUTURES_BASE_URL
 
 def get_recent_futures_candles(symbol: str, interval: str = "1h", limit: int = 24) -> list[dict]:
     url = f"{BINANCE_FUTURES_BASE_URL}/fapi/v1/klines"
-    params = {"symbol": symbol, "interval": interval, "limit": limit}
+    params = {
+        "symbol": symbol,
+        "interval": interval,
+        "limit": limit,
+    }
 
     try:
         response = requests.get(url, params=params, timeout=10)
@@ -22,25 +26,37 @@ def get_recent_futures_candles(symbol: str, interval: str = "1h", limit: int = 2
                 "volume": _safe_float(item[5]),
                 "close_time": item[6],
             })
+
         return candles
+
     except requests.RequestException:
         return []
 
 
 def summarize_candles(candles: list[dict]) -> dict:
     if not candles:
-        return {"available": False, "message": "캔들 데이터를 가져오지 못했습니다."}
+        return {
+            "available": False,
+            "message": "캔들 데이터를 가져오지 못했습니다.",
+        }
 
     first = candles[0]
     last = candles[-1]
+
     first_close = first.get("close")
     last_close = last.get("close")
+
     highs = [c.get("high") for c in candles if c.get("high") is not None]
     lows = [c.get("low") for c in candles if c.get("low") is not None]
     volumes = [c.get("volume") for c in candles if c.get("volume") is not None]
 
+    highest_high = max(highs, default=None)
+    lowest_low = min(lows, default=None)
+    total_volume = sum(volumes)
+
     bullish_count = 0
     bearish_count = 0
+
     for candle in candles:
         if candle.get("close") is None or candle.get("open") is None:
             continue
@@ -67,9 +83,9 @@ def summarize_candles(candles: list[dict]) -> dict:
         "first_close": first_close,
         "last_close": last_close,
         "change_percent": change_percent,
-        "highest_high": max(highs) if highs else None,
-        "lowest_low": min(lows) if lows else None,
-        "total_volume": sum(volumes),
+        "highest_high": highest_high,
+        "lowest_low": lowest_low,
+        "total_volume": total_volume,
         "bullish_candles": bullish_count,
         "bearish_candles": bearish_count,
         "trend": trend,

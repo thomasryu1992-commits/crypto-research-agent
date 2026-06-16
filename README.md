@@ -1,45 +1,75 @@
-# Crypto Research Agent V2
+# Crypto Research Agent V2.2
 
-Python-based crypto trading research agent using Binance public data and Ollama local LLM.
+A Python-based crypto trading research agent using Binance public market data and Ollama local LLM.
 
-## V2 Features
+## V2.2 Core Upgrade
 
-- Uses Ollama local LLM instead of OpenAI API
+V2.2 does not let the LLM make all trading judgments by itself.
+
+Instead:
+
+```text
+Market data
+→ Python rule engine
+→ Structured market context
+→ LLM report writer
+→ Trading scenario report
+```
+
+This reduces logical conflicts such as:
+
+- Saying "chasing is favorable" and later saying "avoid chasing"
+- Mixing short entry scenario with short covering
+- Making unsupported directional claims
+- Inventing support/resistance levels
+
+## Features
+
+- Uses Ollama local LLM
 - Fetches BTC 24h spot market data
-- Fetches BTC funding rate
-- Fetches BTC open interest
-- Fetches recent Binance Futures candles
-- Saves market snapshots locally
+- Fetches Binance Futures funding rate
+- Fetches Binance Futures open interest
+- Fetches recent 1H futures candles
+- Saves market snapshots
 - Calculates changes versus previous snapshot
+- Adds Python-based market judgment:
+  - market bias
+  - positioning structure
+  - chasing permission
+  - long setup status
+  - short setup status
+  - risk level
+  - invalidation logic
 - Generates trading-oriented report:
   - Market Bias
+  - Current Market Structure
   - Futures Positioning
   - Long Scenario
   - Short Scenario
   - Invalidation
   - Risk Level
   - Trading Plan
-- Saves reports to `data/reports/`
+  - Key Checkpoints
 - Telegram sending is optional and disabled by default
 
 ## Setup
 
-```bash
+```powershell
 python -m venv venv
 venv\Scripts\activate
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 copy .env.example .env
 ```
 
-Install Ollama and pull a model:
+Install Ollama model:
 
-```bash
+```powershell
 ollama pull qwen2.5:3b
 ```
 
 Run:
 
-```bash
+```powershell
 python main.py
 ```
 
@@ -57,6 +87,6 @@ TELEGRAM_BOT_TOKEN=
 TELEGRAM_CHAT_ID=
 ```
 
-## GitHub Security
+## Important
 
-Never upload `.env`, API keys, wallet keys, or seed phrases.
+This project generates trading research scenarios, not automatic buy/sell orders.

@@ -16,6 +16,7 @@ def get_open_interest(symbol: str) -> dict:
             "open_interest": _safe_float(data.get("openInterest")),
             "time": data.get("time"),
         }
+
     except requests.RequestException as e:
         return {"symbol": symbol, "error": str(e)}
 
