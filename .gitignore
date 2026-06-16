@@ -2,15 +2,12 @@
 venv/
 __pycache__/
 *.pyc
-*.pyo
-*.pyd
-.Python
 data/reports/*.txt
 data/snapshots/*.json
 logs/
-.DS_Store
-.idea/
 .vscode/
+.idea/
 test_telegram.py
+test_telegram_simple.py
 test_bot_info.py
 test_updates.py

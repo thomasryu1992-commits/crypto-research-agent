@@ -1,108 +1,23 @@
 import requests
 from config import BINANCE_FUTURES_BASE_URL
 
-
-def get_recent_futures_candles(symbol: str, interval: str = "1h", limit: int = 24) -> list[dict]:
-    url = f"{BINANCE_FUTURES_BASE_URL}/fapi/v1/klines"
-    params = {
-        "symbol": symbol,
-        "interval": interval,
-        "limit": limit,
-    }
-
+def get_recent_futures_candles(symbol:str,interval:str="1h",limit:int=24)->list[dict]:
     try:
-        response = requests.get(url, params=params, timeout=10)
-        response.raise_for_status()
-        raw = response.json()
-
-        candles = []
-        for item in raw:
-            candles.append({
-                "open_time": item[0],
-                "open": _safe_float(item[1]),
-                "high": _safe_float(item[2]),
-                "low": _safe_float(item[3]),
-                "close": _safe_float(item[4]),
-                "volume": _safe_float(item[5]),
-                "close_time": item[6],
-            })
-
-        return candles
-
-    except requests.RequestException:
-        return []
-
-
-def summarize_candles(candles: list[dict]) -> dict:
-    if not candles:
-        return {
-            "available": False,
-            "message": "캔들 데이터를 가져오지 못했습니다.",
-        }
-
-    first = candles[0]
-    last = candles[-1]
-
-    first_close = first.get("close")
-    last_close = last.get("close")
-
-    highs = [c.get("high") for c in candles if c.get("high") is not None]
-    lows = [c.get("low") for c in candles if c.get("low") is not None]
-    volumes = [c.get("volume") for c in candles if c.get("volume") is not None]
-
-    highest_high = max(highs, default=None)
-    lowest_low = min(lows, default=None)
-    total_volume = sum(volumes)
-
-    bullish_count = 0
-    bearish_count = 0
-
-    for candle in candles:
-        if candle.get("close") is None or candle.get("open") is None:
-            continue
-        if candle["close"] > candle["open"]:
-            bullish_count += 1
-        elif candle["close"] < candle["open"]:
-            bearish_count += 1
-
-    change_percent = _pct_change(first_close, last_close)
-
-    if change_percent is None:
-        trend = "unknown"
-    elif change_percent > 1:
-        trend = "uptrend"
-    elif change_percent < -1:
-        trend = "downtrend"
-    else:
-        trend = "range"
-
-    return {
-        "available": True,
-        "candle_count": len(candles),
-        "timeframe": "recent_1h_candles",
-        "first_close": first_close,
-        "last_close": last_close,
-        "change_percent": change_percent,
-        "highest_high": highest_high,
-        "lowest_low": lowest_low,
-        "total_volume": total_volume,
-        "bullish_candles": bullish_count,
-        "bearish_candles": bearish_count,
-        "trend": trend,
-    }
-
-
-def _safe_float(value):
+        r=requests.get(f"{BINANCE_FUTURES_BASE_URL}/fapi/v1/klines",params={"symbol":symbol,"interval":interval,"limit":limit},timeout=10); r.raise_for_status()
+        return [{"open_time":i[0],"open":_f(i[1]),"high":_f(i[2]),"low":_f(i[3]),"close":_f(i[4]),"volume":_f(i[5]),"close_time":i[6]} for i in r.json()]
+    except requests.RequestException: return []
+def summarize_candles(candles:list[dict])->dict:
+    if not candles: return {"available":False,"message":"캔들 데이터를 가져오지 못했습니다."}
+    first,last=candles[0],candles[-1]
+    highs=[c.get("high") for c in candles if c.get("high") is not None]; lows=[c.get("low") for c in candles if c.get("low") is not None]; vols=[c.get("volume") for c in candles if c.get("volume") is not None]
+    bullish=sum(1 for c in candles if c.get("close") is not None and c.get("open") is not None and c["close"]>c["open"]); bearish=sum(1 for c in candles if c.get("close") is not None and c.get("open") is not None and c["close"]<c["open"])
+    ch=_pct(first.get("close"),last.get("close")); trend="unknown" if ch is None else "uptrend" if ch>1 else "downtrend" if ch<-1 else "range"
+    return {"available":True,"candle_count":len(candles),"timeframe":"recent_1h_candles","first_close":first.get("close"),"last_close":last.get("close"),"change_percent":ch,"highest_high":max(highs,default=None),"lowest_low":min(lows,default=None),"total_volume":sum(vols),"bullish_candles":bullish,"bearish_candles":bearish,"trend":trend}
+def _f(v):
+    try: return float(v)
+    except: return None
+def _pct(o,n):
     try:
-        return float(value)
-    except (TypeError, ValueError):
-        return None
-
-
-def _pct_change(old, new):
-    try:
-        if old is None or new is None or float(old) == 0:
-            return None
-        return ((float(new) - float(old)) / float(old)) * 100
-    except (TypeError, ValueError, ZeroDivisionError):
-        return None
+        if o is None or n is None or float(o)==0: return None
+        return ((float(n)-float(o))/float(o))*100
+    except: return None
