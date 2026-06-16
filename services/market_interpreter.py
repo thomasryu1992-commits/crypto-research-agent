@@ -56,8 +56,8 @@ def build_market_interpretation(market_data: dict) -> dict:
         "long_text": _build_long_text(market_context, key_levels),
         "short_text": _build_short_text(market_context, key_levels),
         "risk_text": _build_risk_text(market_context),
-        "invalidation_text": _build_invalidation_text(market_context, key_levels),
-        "plan_text": _build_plan_text(key_levels),
+        "invalidation": _build_invalidation_object(key_levels),
+        "trading_plan": _build_trading_plan_object(key_levels),
         "checkpoint_text": _build_checkpoint_text(key_levels),
         "strict_language_rules": [
             "매수/매도 지시를 하지 않는다.",
@@ -66,6 +66,8 @@ def build_market_interpretation(market_data: dict) -> dict:
             "OI는 항상 시장 전체 OI라고 표현한다.",
             "현재는 추격 진입보다 확인 매매가 우선이라는 관점을 유지한다.",
             "지지/저항 구간은 Python이 계산한 key_levels만 사용한다.",
+            "Trading Plan에는 실패, 무효화, 회복 실패, 유지 실패라는 표현을 쓰지 않는다.",
+            "Invalidation 조건을 Trading Plan에 섞지 않는다.",
         ],
     }
 
@@ -289,29 +291,53 @@ def _build_risk_text(market_context):
     )
 
 
-def _build_invalidation_text(market_context, key_levels):
+def _build_invalidation_object(key_levels):
     resistance = key_levels["reference_resistance_zone"]["label"]
     support = key_levels["reference_support_zone"]["label"]
 
-    return (
-        f"Long Invalidation: 상방 시나리오는 참고 저항 구간 {resistance} 회복 실패, "
-        f"1H 종가의 저항 구간 위 유지 실패, 참고 지지 구간 {support} 이탈, "
-        f"가격 하락과 시장 전체 OI 증가가 동시에 나타날 때 약화됩니다. "
-        f"Short Invalidation: 하방 시나리오는 참고 지지 구간 {support} 이탈 실패, "
-        f"1H 종가의 지지 구간 아래 마감 실패, 참고 저항 구간 {resistance} 회복, "
-        f"가격 상승과 시장 전체 OI 유지 또는 증가가 동시에 나타날 때 약화됩니다."
-    )
+    return {
+        "long_invalidation": (
+            f"상방 시나리오는 참고 저항 구간 {resistance} 회복 실패, "
+            f"1H 종가의 저항 구간 위 유지 실패, 참고 지지 구간 {support} 이탈, "
+            f"가격 하락과 시장 전체 OI 증가가 동시에 나타날 때 약화됩니다."
+        ),
+        "short_invalidation": (
+            f"하방 시나리오는 참고 지지 구간 {support} 이탈 실패, "
+            f"1H 종가의 지지 구간 아래 마감 실패, 참고 저항 구간 {resistance} 회복, "
+            f"가격 상승과 시장 전체 OI 유지 또는 증가가 동시에 나타날 때 약화됩니다."
+        ),
+    }
 
 
-def _build_plan_text(key_levels):
+def _build_trading_plan_object(key_levels):
     resistance = key_levels["reference_resistance_zone"]["label"]
     support = key_levels["reference_support_zone"]["label"]
 
-    return (
-        f"상방 대응은 참고 저항 구간 {resistance} 회복과 1H 종가 유지가 확인될 때만 유효합니다. "
-        f"하방 대응은 참고 지지 구간 {support} 이탈과 이탈 구간 아래 1H 마감, 이후 반등 실패가 확인될 때만 유효합니다. "
-        f"가격이 참고 지지와 저항 사이에 머무르고 시장 전체 OI와 Funding이 뚜렷한 방향성을 보이지 않으면 대기가 우선입니다."
-    )
+    return {
+        "upside_plan": (
+            f"상방 대응은 참고 저항 구간 {resistance} 회복과 "
+            f"1H 종가가 해당 구간 위에서 유지되는지 확인하는 것이 핵심입니다. "
+            f"이때 가격 상승과 함께 거래량이 동반되고 시장 전체 OI가 급감하지 않는지 확인해야 합니다."
+        ),
+        "downside_plan": (
+            f"하방 대응은 참고 지지 구간 {support} 이탈과 "
+            f"1H 종가가 해당 구간 아래에서 마감하는지 확인하는 것이 핵심입니다. "
+            f"이후 반등에서 이전 지지 구간을 회복하지 못하고 시장 전체 OI가 유지 또는 증가하는지 확인해야 합니다."
+        ),
+        "wait_plan": (
+            f"가격이 참고 지지 구간 {support}과 참고 저항 구간 {resistance} 사이에 머무르고 "
+            f"시장 전체 OI와 Funding Rate가 뚜렷한 방향성을 보이지 않으면 대기가 우선입니다."
+        ),
+        "banned_in_trading_plan": [
+            "회복 실패",
+            "유지 실패",
+            "마감 실패",
+            "약화",
+            "Invalidation",
+            "청산",
+            "진입",
+        ],
+    }
 
 
 def _build_checkpoint_text(key_levels):
