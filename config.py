@@ -3,8 +3,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
-
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "")
 
@@ -13,3 +11,6 @@ REPORT_LANGUAGE = os.getenv("REPORT_LANGUAGE", "ko")
 
 BINANCE_SPOT_BASE_URL = "https://api.binance.com"
 BINANCE_FUTURES_BASE_URL = "https://fapi.binance.com"
+
+OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "qwen2.5:3b")

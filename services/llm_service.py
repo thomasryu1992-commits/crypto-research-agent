@@ -1,34 +1,37 @@
-from openai import OpenAI
-from config import OPENAI_API_KEY
+import requests
+from config import OLLAMA_BASE_URL, OLLAMA_MODEL
 
 
 def ask_llm(prompt: str) -> str:
-    if not OPENAI_API_KEY:
-        return """
-OpenAI API key is missing.
+    url = f"{OLLAMA_BASE_URL}/api/generate"
 
-.env 파일에 아래 값을 추가해줘.
+    payload = {
+        "model": OLLAMA_MODEL,
+        "prompt": prompt,
+        "stream": False,
+        "options": {
+            "temperature": 0.3
+        }
+    }
 
-OPENAI_API_KEY=your_openai_api_key
+    try:
+        response = requests.post(url, json=payload, timeout=180)
+        response.raise_for_status()
 
-현재는 LLM 리포트를 생성할 수 없기 때문에, 시장 데이터 수집 구조만 테스트된 상태야.
+        data = response.json()
+        return data.get("response", "").strip()
+
+    except requests.RequestException as e:
+        return f"""
+Ollama 호출에 실패했습니다.
+
+확인할 것:
+1. Ollama가 설치되어 있는지 확인
+2. 터미널에서 `ollama --version` 확인
+3. 모델이 설치되어 있는지 확인: `ollama list`
+4. 모델 다운로드: `ollama pull {OLLAMA_MODEL}`
+5. Ollama가 백그라운드에서 실행 중인지 확인
+
+에러:
+{e}
 """.strip()
-
-    client = OpenAI(api_key=OPENAI_API_KEY)
-
-    response = client.chat.completions.create(
-        model="gpt-4.1-mini",
-        messages=[
-            {
-                "role": "system",
-                "content": "너는 크립토 시장을 분석하는 전문 리서치 애널리스트다. 데이터 기반으로 차분하고 명확하게 분석한다.",
-            },
-            {
-                "role": "user",
-                "content": prompt,
-            },
-        ],
-        temperature=0.3,
-    )
-
-    return response.choices[0].message.content

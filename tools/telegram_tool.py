@@ -18,7 +18,7 @@ def send_telegram_message(message: str) -> dict:
     }
 
     try:
-        response = requests.post(url, json=payload, timeout=10)
+        response = requests.post(url, json=payload, timeout=30)
         response.raise_for_status()
 
         return {
