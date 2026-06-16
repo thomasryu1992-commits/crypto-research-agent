@@ -1,7 +1,7 @@
 from services.llm_service import ask_llm
 from tools.telegram_tool import send_telegram_message
 from memory.report_memory import save_report
-from config import REPORT_LANGUAGE
+from config import REPORT_LANGUAGE, SEND_TELEGRAM
 
 
 class ReportAgent:
@@ -12,18 +12,21 @@ class ReportAgent:
         saved_path = save_report(report)
         print(f"Report saved: {saved_path}")
 
-        telegram_result = send_telegram_message(report)
-        if telegram_result.get("sent"):
-            print("Telegram message sent successfully.")
+        if SEND_TELEGRAM:
+            telegram_result = send_telegram_message(report)
+            if telegram_result.get("sent"):
+                print("Telegram message sent successfully.")
+            else:
+                print(f"Telegram skipped or failed: {telegram_result.get('reason')}")
         else:
-            print(f"Telegram skipped or failed: {telegram_result.get('reason')}")
+            print("Telegram skipped: SEND_TELEGRAM=false")
 
         return report
 
     def _build_prompt(self, market_data: dict) -> str:
-    language_instruction = "한국어로 작성해줘." if REPORT_LANGUAGE == "ko" else "Write in English."
+        language_instruction = "한국어로 작성해줘." if REPORT_LANGUAGE == "ko" else "Write in English."
 
-    return f"""
+        return f"""
 너는 크립토 선물 시장을 분석하는 트레이딩 리서치 애널리스트야.
 
 아래 시장 데이터를 바탕으로 BTC Daily Trading Research Report를 작성해줘.
@@ -45,6 +48,9 @@ class ReportAgent:
 - 반복적인 문장은 피하고, 실행 가능한 관찰 포인트를 제시한다.
 - 수치가 주어지면 가능한 한 수치를 활용한다.
 - 알 수 없는 지지선/저항선 가격을 임의로 만들지 말고, "직전 고점", "단기 저항", "현재 가격대", "주요 지지 구간"처럼 표현한다.
+- 리스크는 Low / Medium / High 중 하나로 분류한다.
+- 변화율 데이터가 있으면 절대값보다 변화율을 우선적으로 해석한다.
+- 이전 스냅샷이 없는 경우, "변화율은 다음 실행부터 더 의미 있게 해석 가능하다"고 명확히 말한다.
 
 리포트 형식:
 
@@ -54,8 +60,7 @@ class ReportAgent:
 현재 시장 방향성을 중립 / 약상방 / 강상방 / 약하방 / 강하방 중 하나로 판단하고, 이유를 설명해.
 
 ## 2. Current Market Structure
-현재 가격 흐름을 설명해.
-가격 상승/하락, 현물과 선물 가격 차이, 시장 분위기를 연결해서 해석해.
+현재 가격 흐름, 24시간 변화율, 최근 1시간봉 흐름을 연결해서 설명해.
 
 ## 3. Futures Positioning
 Funding Rate와 Open Interest를 함께 해석해.
@@ -88,11 +93,11 @@ Funding Rate와 Open Interest를 함께 해석해.
 
 ## 7. Risk Level
 현재 리스크를 Low / Medium / High 중 하나로 분류해.
-그 이유를 가격, Funding, OI 조합으로 설명해.
+그 이유를 가격, Funding, OI, 최근 캔들 흐름으로 설명해.
 
 ## 8. Trading Plan
 오늘 관찰해야 할 행동 계획을 작성해.
-단, 직접적인 매수/매도 지시가 아니라 조건부 대응 계획으로 작성해.
+직접적인 매수/매도 지시가 아니라 조건부 대응 계획으로 작성해.
 
 ## 9. Key Checkpoints
 마지막에 오늘 체크해야 할 핵심 포인트를 bullet로 정리해.

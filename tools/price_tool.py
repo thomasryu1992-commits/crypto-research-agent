@@ -21,12 +21,8 @@ def get_price_data(symbol: str) -> dict:
             "volume": _safe_float(data.get("volume")),
             "quote_volume": _safe_float(data.get("quoteVolume")),
         }
-
     except requests.RequestException as e:
-        return {
-            "symbol": symbol,
-            "error": str(e),
-        }
+        return {"symbol": symbol, "error": str(e)}
 
 
 def _safe_float(value):

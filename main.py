@@ -6,7 +6,7 @@ def main():
     report = agent.run_daily_research()
 
     print("\n" + "=" * 80)
-    print("DAILY CRYPTO RESEARCH REPORT")
+    print("DAILY BTC TRADING RESEARCH REPORT")
     print("=" * 80)
     print(report)
     print("=" * 80 + "\n")

@@ -6,7 +6,11 @@ __pycache__/
 *.pyd
 .Python
 data/reports/*.txt
+data/snapshots/*.json
 logs/
 .DS_Store
 .idea/
 .vscode/
+test_telegram.py
+test_bot_info.py
+test_updates.py

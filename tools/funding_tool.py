@@ -18,12 +18,8 @@ def get_funding_rate(symbol: str) -> dict:
             "mark_price": _safe_float(data.get("markPrice")),
             "index_price": _safe_float(data.get("indexPrice")),
         }
-
     except requests.RequestException as e:
-        return {
-            "symbol": symbol,
-            "error": str(e),
-        }
+        return {"symbol": symbol, "error": str(e)}
 
 
 def _safe_float(value):
