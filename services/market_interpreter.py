@@ -1,0 +1,352 @@
+def build_market_interpretation(market_data: dict) -> dict:
+    snapshot = market_data.get("current_snapshot", {})
+    delta = market_data.get("delta", {})
+    market_context = market_data.get("market_context", {})
+    candle_summary = market_data.get("candle_summary", {})
+
+    price = snapshot.get("price")
+    price_change_24h = snapshot.get("price_change_percent_24h")
+    high_24h = snapshot.get("high_price_24h")
+    low_24h = snapshot.get("low_price_24h")
+    funding_rate = snapshot.get("funding_rate")
+    open_interest = snapshot.get("open_interest")
+
+    oi_change = delta.get("open_interest_change_since_last_snapshot")
+    price_change_snapshot = delta.get("price_change_since_last_snapshot")
+    volume_change = delta.get("volume_change_since_last_snapshot")
+
+    funding_percent = _to_percent(funding_rate)
+    key_levels = _build_key_levels(snapshot, candle_summary)
+
+    return {
+        "summary": {
+            "symbol": snapshot.get("symbol"),
+            "price": price,
+            "price_change_24h": price_change_24h,
+            "high_24h": high_24h,
+            "low_24h": low_24h,
+            "funding_rate_raw": funding_rate,
+            "funding_rate_percent": funding_percent,
+            "open_interest": open_interest,
+            "open_interest_change_since_last_snapshot": oi_change,
+            "price_change_since_last_snapshot": price_change_snapshot,
+            "volume_change_since_last_snapshot": volume_change,
+        },
+        "key_levels": key_levels,
+        "bias": market_context.get("bias", "neutral"),
+        "bias_text": _build_bias_text(
+            market_context.get("bias"),
+            price_change_24h,
+            funding_percent,
+            candle_summary,
+        ),
+        "structure_text": _build_structure_text(
+            price,
+            price_change_24h,
+            high_24h,
+            low_24h,
+            candle_summary,
+            key_levels,
+        ),
+        "funding_text": _build_funding_text(funding_rate, funding_percent),
+        "oi_text": _build_oi_text(open_interest, oi_change),
+        "positioning_text": _build_positioning_text(
+            market_context.get("positioning_structure")
+        ),
+        "long_text": _build_long_text(market_context, key_levels),
+        "short_text": _build_short_text(market_context, key_levels),
+        "risk_text": _build_risk_text(market_context),
+        "invalidation": _build_invalidation_object(key_levels),
+        "trading_plan": _build_trading_plan_object(key_levels),
+        "checkpoint_text": _build_checkpoint_text(key_levels),
+        "strict_language_rules": [
+            "매수/매도 지시를 하지 않는다.",
+            "롱/숏 진입을 고려한다는 표현을 쓰지 않는다.",
+            "상방 시나리오와 하방 시나리오의 유효 조건만 설명한다.",
+            "OI는 항상 시장 전체 OI라고 표현한다.",
+            "현재는 추격 진입보다 확인 매매가 우선이라는 관점을 유지한다.",
+            "지지/저항 구간은 Python이 계산한 key_levels만 사용한다.",
+            "Trading Plan에는 실패, 무효화, 회복 실패, 유지 실패라는 표현을 쓰지 않는다.",
+            "Invalidation 조건을 Trading Plan에 섞지 않는다.",
+        ],
+    }
+
+
+def _build_key_levels(snapshot: dict, candle_summary: dict) -> dict:
+    high_24h = snapshot.get("high_price_24h")
+    low_24h = snapshot.get("low_price_24h")
+    recent_high = candle_summary.get("highest_high")
+    recent_low = candle_summary.get("lowest_low")
+    current_price = snapshot.get("price")
+
+    resistance_values = [v for v in [recent_high, high_24h] if _is_number(v)]
+    support_values = [v for v in [recent_low, low_24h] if _is_number(v)]
+
+    if resistance_values:
+        resistance_low = min(resistance_values)
+        resistance_high = max(resistance_values)
+    else:
+        resistance_low = None
+        resistance_high = None
+
+    if support_values:
+        support_low = min(support_values)
+        support_high = max(support_values)
+    else:
+        support_low = None
+        support_high = None
+
+    return {
+        "current_price": current_price,
+        "reference_resistance_zone": {
+            "low": resistance_low,
+            "high": resistance_high,
+            "label": _zone_label(resistance_low, resistance_high),
+            "basis": "recent_1h_high_to_24h_high",
+        },
+        "reference_support_zone": {
+            "low": support_low,
+            "high": support_high,
+            "label": _zone_label(support_low, support_high),
+            "basis": "recent_1h_low_to_24h_low",
+        },
+        "recent_1h_high": recent_high,
+        "recent_1h_low": recent_low,
+        "high_24h": high_24h,
+        "low_24h": low_24h,
+    }
+
+
+def _is_number(value):
+    try:
+        float(value)
+        return True
+    except (TypeError, ValueError):
+        return False
+
+
+def _zone_label(low, high):
+    if low is None or high is None:
+        return "N/A"
+    if abs(float(low) - float(high)) < 0.000001:
+        return _fmt_num(low, 2)
+    return f"{_fmt_num(low, 2)} ~ {_fmt_num(high, 2)}"
+
+
+def _to_percent(value):
+    try:
+        if value is None:
+            return None
+        return float(value) * 100
+    except (TypeError, ValueError):
+        return None
+
+
+def _fmt_num(value, decimals=4):
+    try:
+        if value is None:
+            return "N/A"
+        return f"{float(value):,.{decimals}f}"
+    except (TypeError, ValueError):
+        return "N/A"
+
+
+def _fmt_pct(value, decimals=4, signed=True):
+    try:
+        if value is None:
+            return "N/A"
+        sign = "+" if signed and float(value) > 0 else ""
+        return f"{sign}{float(value):.{decimals}f}%"
+    except (TypeError, ValueError):
+        return "N/A"
+
+
+def _build_bias_text(bias, price_change_24h, funding_percent, candle_summary):
+    trend = candle_summary.get("trend")
+    bullish = candle_summary.get("bullish_candles")
+    bearish = candle_summary.get("bearish_candles")
+    candle_change = candle_summary.get("change_percent")
+
+    if bias in ["mildly_bearish", "bearish_with_short_build_up", "neutral_to_bearish_with_long_trap_risk"]:
+        base = "현재 시장 Bias는 약하방입니다."
+    elif bias in ["mildly_bullish", "neutral_to_bullish", "bullish_but_overheated"]:
+        base = "현재 시장 Bias는 약상방입니다."
+    else:
+        base = "현재 시장 Bias는 중립에 가깝습니다."
+
+    detail = (
+        f"24시간 가격 변화율은 {_fmt_pct(price_change_24h, 3)}이고, "
+        f"최근 24개 1H 캔들은 {trend} 구조입니다. "
+        f"상승 캔들 {bullish}개, 하락 캔들 {bearish}개이며, "
+        f"최근 1H 묶음 기준 종가 변화율은 {_fmt_pct(candle_change, 3)}입니다. "
+        f"Funding Rate는 {_fmt_pct(funding_percent, 6)} 수준입니다."
+    )
+
+    return f"{base} {detail}"
+
+
+def _build_structure_text(price, price_change_24h, high_24h, low_24h, candle_summary, key_levels):
+    trend = candle_summary.get("trend")
+    bullish = candle_summary.get("bullish_candles")
+    bearish = candle_summary.get("bearish_candles")
+    candle_change = candle_summary.get("change_percent")
+    last_close = candle_summary.get("last_close")
+    resistance = key_levels["reference_resistance_zone"]["label"]
+    support = key_levels["reference_support_zone"]["label"]
+
+    if trend == "downtrend":
+        structure = "단기 구조는 하락 우위입니다."
+    elif trend == "uptrend":
+        structure = "단기 구조는 상승 우위입니다."
+    elif trend == "range":
+        structure = "단기 구조는 박스권에 가깝습니다."
+    else:
+        structure = "단기 구조는 명확하지 않습니다."
+
+    return (
+        f"현재 가격은 {_fmt_num(price, 2)}이며, 24시간 변화율은 {_fmt_pct(price_change_24h, 3)}입니다. "
+        f"24시간 고가는 {_fmt_num(high_24h, 2)}, 저가는 {_fmt_num(low_24h, 2)}입니다. "
+        f"최근 24개 1H 캔들 기준 마지막 종가는 {_fmt_num(last_close, 2)}이고, "
+        f"해당 구간 종가 변화율은 {_fmt_pct(candle_change, 3)}입니다. "
+        f"상승 캔들 {bullish}개, 하락 캔들 {bearish}개로 {structure} "
+        f"참고 저항 구간은 {resistance}, 참고 지지 구간은 {support}입니다. "
+        f"현재는 추격 진입보다 확인 매매가 우선입니다."
+    )
+
+
+def _build_funding_text(funding_rate, funding_percent):
+    if funding_rate is None:
+        return "Funding Rate 데이터가 없어 포지셔닝 해석 신뢰도가 제한됩니다."
+
+    if funding_rate > 0.0001:
+        state = "양수이며 롱 쪽 비용 부담이 커지는 구간"
+    elif funding_rate > 0:
+        state = "양수지만 거의 중립에 가까운 구간"
+    elif funding_rate < -0.0001:
+        state = "음수이며 숏 쪽 비용 부담이 커지는 구간"
+    elif funding_rate < 0:
+        state = "음수지만 거의 중립에 가까운 구간"
+    else:
+        state = "중립에 가까운 구간"
+
+    return f"Funding Rate는 {_fmt_pct(funding_percent, 6)}로, {state}입니다."
+
+
+def _build_oi_text(open_interest, oi_change):
+    if oi_change is None:
+        return f"시장 전체 OI는 {_fmt_num(open_interest, 3)}입니다. 이전 스냅샷이 없어 변화율 판단은 제한됩니다."
+
+    direction = "증가" if oi_change > 0 else "감소" if oi_change < 0 else "유지"
+    return (
+        f"시장 전체 OI는 {_fmt_num(open_interest, 3)}이며, "
+        f"이전 스냅샷 대비 {_fmt_pct(oi_change, 3)} {direction}했습니다."
+    )
+
+
+def _build_positioning_text(positioning):
+    readable = {
+        "price_up_funding_positive_oi_up_long_overheat_risk": "가격 상승, 양수 Funding, 시장 전체 OI 증가 조합으로 롱 과열 가능성이 있습니다.",
+        "price_up_funding_negative_oi_stable_or_up_short_pressure": "가격 상승, 음수 Funding, 시장 전체 OI 유지/증가 조합으로 숏 압박 가능성이 있습니다.",
+        "price_up_oi_down_short_covering_possible": "가격 상승과 시장 전체 OI 감소 조합으로 포지션 축소성 상승 가능성이 있습니다.",
+        "price_down_funding_positive_oi_up_long_trap_risk": "가격 하락, 양수 Funding, 시장 전체 OI 증가 조합으로 롱 트랩 리스크가 있습니다.",
+        "price_down_funding_negative_oi_up_short_dominant": "가격 하락, 음수 Funding, 시장 전체 OI 증가 조합으로 숏 우위 흐름이 나타날 수 있습니다.",
+        "price_down_oi_down_deleveraging": "가격 하락과 시장 전체 OI 감소 조합으로 디레버리징 가능성이 있습니다.",
+        "mixed_or_range_positioning": "가격, Funding, 시장 전체 OI 조합이 혼재되어 방향성이 강하지 않습니다.",
+        "insufficient_data": "포지셔닝 판단을 위한 데이터가 충분하지 않습니다.",
+    }
+
+    return readable.get(positioning, f"포지셔닝 구조는 {positioning}입니다.")
+
+
+def _build_long_text(market_context, key_levels):
+    long_setup = market_context.get("long_setup", {})
+    thesis = long_setup.get("thesis", "상방 시나리오는 확인 조건이 필요합니다.")
+    resistance = key_levels["reference_resistance_zone"]["label"]
+
+    return (
+        f"{thesis} 상방 시나리오는 참고 저항 구간 {resistance} 회복, "
+        f"1H 종가의 저항 구간 위 마감, 시장 전체 OI 유지 또는 증가, "
+        f"Funding Rate 중립 유지, 가격 상승 시 거래량 동반이 확인될 때 강화됩니다."
+    )
+
+
+def _build_short_text(market_context, key_levels):
+    short_setup = market_context.get("short_setup", {})
+    thesis = short_setup.get("thesis", "하방 시나리오는 확인 조건이 필요합니다.")
+    support = key_levels["reference_support_zone"]["label"]
+
+    return (
+        f"{thesis} 하방 시나리오는 참고 지지 구간 {support} 이탈, "
+        f"1H 종가의 지지 구간 아래 마감, 반등 시 이전 지지 구간 회복 실패, "
+        f"하락 중 시장 전체 OI 유지 또는 증가, 반등 시 거래량 부족이 확인될 때 강화됩니다."
+    )
+
+
+def _build_risk_text(market_context):
+    risk_level = market_context.get("risk_level", "Medium")
+    return (
+        f"현재 리스크 등급은 {risk_level}입니다. "
+        f"가장 주의해야 할 행동은 확인 없는 추격 진입, 지지/저항 근처에서의 늦은 대응, "
+        f"시장 전체 OI가 급변하는 구간에서의 과도한 레버리지 사용입니다."
+    )
+
+
+def _build_invalidation_object(key_levels):
+    resistance = key_levels["reference_resistance_zone"]["label"]
+    support = key_levels["reference_support_zone"]["label"]
+
+    return {
+        "long_invalidation": (
+            f"상방 시나리오는 참고 저항 구간 {resistance} 회복 실패, "
+            f"1H 종가의 저항 구간 위 유지 실패, 참고 지지 구간 {support} 이탈, "
+            f"가격 하락과 시장 전체 OI 증가가 동시에 나타날 때 약화됩니다."
+        ),
+        "short_invalidation": (
+            f"하방 시나리오는 참고 지지 구간 {support} 이탈 실패, "
+            f"1H 종가의 지지 구간 아래 마감 실패, 참고 저항 구간 {resistance} 회복, "
+            f"가격 상승과 시장 전체 OI 유지 또는 증가가 동시에 나타날 때 약화됩니다."
+        ),
+    }
+
+
+def _build_trading_plan_object(key_levels):
+    resistance = key_levels["reference_resistance_zone"]["label"]
+    support = key_levels["reference_support_zone"]["label"]
+
+    return {
+        "upside_plan": (
+            f"상방 대응은 참고 저항 구간 {resistance} 회복과 "
+            f"1H 종가가 해당 구간 위에서 유지되는지 확인하는 것이 핵심입니다. "
+            f"이때 가격 상승과 함께 거래량이 동반되고 시장 전체 OI가 급감하지 않는지 확인해야 합니다."
+        ),
+        "downside_plan": (
+            f"하방 대응은 참고 지지 구간 {support} 이탈과 "
+            f"1H 종가가 해당 구간 아래에서 마감하는지 확인하는 것이 핵심입니다. "
+            f"이후 반등에서 이전 지지 구간을 회복하지 못하고 시장 전체 OI가 유지 또는 증가하는지 확인해야 합니다."
+        ),
+        "wait_plan": (
+            f"가격이 참고 지지 구간 {support}과 참고 저항 구간 {resistance} 사이에 머무르고 "
+            f"시장 전체 OI와 Funding Rate가 뚜렷한 방향성을 보이지 않으면 대기가 우선입니다."
+        ),
+        "banned_in_trading_plan": [
+            "회복 실패",
+            "유지 실패",
+            "마감 실패",
+            "약화",
+            "Invalidation",
+            "청산",
+            "진입",
+        ],
+    }
+
+
+def _build_checkpoint_text(key_levels):
+    resistance = key_levels["reference_resistance_zone"]["label"]
+    support = key_levels["reference_support_zone"]["label"]
+
+    return (
+        f"핵심 체크포인트는 참고 저항 구간 {resistance} 회복 여부, "
+        f"참고 지지 구간 {support} 이탈 여부, 1H 종가 기준 유지 여부, "
+        f"시장 전체 OI의 이전 스냅샷 대비 변화, Funding Rate 방향, "
+        f"가격 상승/하락 시 거래량 동반 여부입니다."
+    )
