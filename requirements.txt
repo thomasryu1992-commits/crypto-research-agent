@@ -1,0 +1,5 @@
+# V3 MVP uses Python standard library only.
+
+requests>=2.31.0
+pandas>=2.0.0
+lxml>=4.9.0

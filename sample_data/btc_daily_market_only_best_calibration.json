@@ -1,0 +1,21 @@
+{
+  "daily": {
+    "bullish_threshold": 0.3,
+    "constructive_threshold": 0.25,
+    "risk_off_threshold": -0.3,
+    "bearish_threshold": -0.4,
+    "market_confirm_threshold": 0.05,
+    "market_bearish_confirm_threshold": -0.2
+  },
+  "metadata": {
+    "timeframe": "daily",
+    "primary_window": 7,
+    "objective_score": 0.451306,
+    "direction_accuracy": 0.5238095238095238,
+    "bullish_signal_count": 17,
+    "bearish_signal_count": 25,
+    "avg_forward_return_bullish": -0.7330193241559276,
+    "avg_forward_return_bearish": -3.0839138750788053,
+    "warning": "Optimized on historical data. Validate out-of-sample before relying on it."
+  }
+}

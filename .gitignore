@@ -1,0 +1,11 @@
+.env
+venv/
+__pycache__/
+*.pyc
+data/backtests/*.csv
+data/backtests/*.json
+data/reports/*.txt
+data/processed/*.json
+.DS_Store
+.idea/
+.vscode/

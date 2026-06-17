@@ -1,0 +1,18 @@
+{
+  "daily": {
+    "bullish_threshold": 0.45,
+    "constructive_threshold": 0.25,
+    "risk_off_threshold": -0.25,
+    "bearish_threshold": -0.45,
+    "market_confirm_threshold": 0.15,
+    "market_bearish_confirm_threshold": -0.15
+  },
+  "weekly": {
+    "bullish_threshold": 0.35,
+    "constructive_threshold": 0.2,
+    "risk_off_threshold": -0.25,
+    "bearish_threshold": -0.6,
+    "market_confirm_threshold": 0.2,
+    "market_bearish_confirm_threshold": -0.3
+  }
+}

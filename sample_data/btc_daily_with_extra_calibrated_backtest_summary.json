@@ -1,0 +1,115 @@
+{
+  "primary_window": 7,
+  "sample_count": 510,
+  "directional_signal_count": 71,
+  "direction_accuracy": 0.5492957746478874,
+  "bullish_signal_count": 52,
+  "bearish_signal_count": 19,
+  "constructive_signal_count": 57,
+  "risk_off_signal_count": 69,
+  "neutral_signal_count": 313,
+  "avg_forward_return_all": -0.4844633689139641,
+  "avg_forward_return_bullish": 0.014382748003222165,
+  "avg_forward_return_bearish": -3.410949802312978,
+  "avg_forward_return_constructive": 0.376799292398416,
+  "avg_forward_return_risk_off": -1.3826370357958933,
+  "avg_forward_return_neutral": -0.3485360351282292,
+  "hit_rate_bullish": 0.5192307692307693,
+  "hit_rate_bearish": 0.631578947368421,
+  "score_bucket_summary": {
+    "strong_bullish_score": {
+      "count": 0,
+      "avg_forward_return": null,
+      "positive_rate": null,
+      "negative_rate": null
+    },
+    "bullish_score": {
+      "count": 76,
+      "avg_forward_return": 0.49441625053222527,
+      "positive_rate": 0.5789473684210527,
+      "negative_rate": 0.42105263157894735
+    },
+    "neutral_score": {
+      "count": 329,
+      "avg_forward_return": -0.32062304828052746,
+      "positive_rate": 0.49240121580547114,
+      "negative_rate": 0.5075987841945289
+    },
+    "bearish_score": {
+      "count": 99,
+      "avg_forward_return": -1.6495714469843208,
+      "positive_rate": 0.45454545454545453,
+      "negative_rate": 0.5454545454545454
+    },
+    "strong_bearish_score": {
+      "count": 6,
+      "avg_forward_return": -2.643232841804919,
+      "positive_rate": 0.3333333333333333,
+      "negative_rate": 0.6666666666666666
+    }
+  },
+  "scenario_summary": {
+    "Neutral / Wait": {
+      "count": 313,
+      "avg_forward_return": -0.3485360351282292,
+      "positive_rate": 0.48881789137380194,
+      "negative_rate": 0.5111821086261981
+    },
+    "Risk-Off / Upside Weakening": {
+      "count": 69,
+      "avg_forward_return": -1.3826370357958933,
+      "positive_rate": 0.4492753623188406,
+      "negative_rate": 0.5507246376811594
+    },
+    "Confirmed Downside Pressure": {
+      "count": 19,
+      "avg_forward_return": -3.410949802312978,
+      "positive_rate": 0.3684210526315789,
+      "negative_rate": 0.631578947368421
+    },
+    "Constructive but Unconfirmed": {
+      "count": 57,
+      "avg_forward_return": 0.376799292398416,
+      "positive_rate": 0.6140350877192983,
+      "negative_rate": 0.38596491228070173
+    },
+    "Confirmed Upside Momentum": {
+      "count": 52,
+      "avg_forward_return": 0.014382748003222165,
+      "positive_rate": 0.5192307692307693,
+      "negative_rate": 0.4807692307692308
+    }
+  },
+  "bias_summary": {
+    "Neutral": {
+      "count": 313,
+      "avg_forward_return": -0.3485360351282292,
+      "positive_rate": 0.48881789137380194,
+      "negative_rate": 0.5111821086261981
+    },
+    "Risk-Off": {
+      "count": 69,
+      "avg_forward_return": -1.3826370357958933,
+      "positive_rate": 0.4492753623188406,
+      "negative_rate": 0.5507246376811594
+    },
+    "Bearish": {
+      "count": 19,
+      "avg_forward_return": -3.410949802312978,
+      "positive_rate": 0.3684210526315789,
+      "negative_rate": 0.631578947368421
+    },
+    "Constructive": {
+      "count": 57,
+      "avg_forward_return": 0.376799292398416,
+      "positive_rate": 0.6140350877192983,
+      "negative_rate": 0.38596491228070173
+    },
+    "Bullish": {
+      "count": 52,
+      "avg_forward_return": 0.014382748003222165,
+      "positive_rate": 0.5192307692307693,
+      "negative_rate": 0.4807692307692308
+    }
+  }
+}

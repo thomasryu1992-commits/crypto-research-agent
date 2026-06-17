@@ -1,0 +1,4 @@
+﻿date,total_btc_etf_netflow,ibit_netflow,etf_5d_netflow,etf_consecutive_inflow_days,etf_consecutive_outflow_days,exchange_netflow,exchange_reserve,stablecoin_supply,stablecoin_exchange_reserve,mvrv,sopr,active_addresses,tx_count
+2025-01-01,250000000.0,120000000.0,250000000.0,1,0,,,,,,,,
+2025-01-02,-100000000.0,0.0,150000000.0,0,1,,,,,,,,
+2025-01-03,350000000.0,180000000.0,500000000.0,1,0,,,,,,,,
