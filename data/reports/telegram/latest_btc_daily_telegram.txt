@@ -1,0 +1,42 @@
+# BTC DAILY Crypto Market Research Report - V3.7
+## 1. Executive Summary
+## 2. Core Category Scores
+## 3. External Data Scores
+## 4. Market Metrics
+## 5. Positioning / Flow Metrics
+## 6. External Metrics
+## 7. Signal Timing Interpretation
+## 8. Conclusion
+## 9. Real-Time Trading Context
+### 9.1 Current Market State
+- Trading Bot Market State: Bearish
+- Trading Bot Market Score: -0.5
+- Trading Bot Market Bias: RANGE
+### 9.2 Real-Time Key Metrics
+- BTC Price: 64,054.90
+- 24H Price Change: -2.3396%
+- Funding Rate: 0
+- Open Interest: 6.42B
+- Long/Short Ratio: 1.8345
+- 24H Liquidation: 46.51M
+### 9.3 Risk Flags
+### 9.4 Evidence Classification
+### 9.5 Real-Time Interpretation
+### 9.6 Context Overlay
+- Overlay Status: Neutral with Bearish Risk
+### 9.7 Scenario Overlay
+Base Scenario: Long/Short Ratio가 높은 상태이므로 시장은 롱 포지션 쏠림 구간입니다. 가격이 지지선 위에 머물면 상승 흐름은 유지될 수 있지만, 지지선 이탈 시 롱 청산 압력이 커질 수 있습니다.
+### 9.8 Watch Conditions
+- Funding Rate 과열 여부
+- Long/Short Ratio 추가 상승 여부
+## 10. Final Research Summary
+### 10.1 Overall View
+### 10.2 Conviction
+- Conviction Level: Medium
+- Overlay Status: Neutral with Bearish Risk
+- Active Risk Flags: None
+### 10.3 Main Risk
+### 10.4 Best Research Action
+현재는 명확한 추세 확정보다는 주요 지표의 다음 변화를 확인해야 하는 구간입니다. 가격, OI, Funding, Long/Short Ratio를 함께 추적해야 합니다.
+### 10.5 Final Conclusion
+다음 업데이트에서는 가격 변화, OI 변화, Long/Short Ratio, liquidation_24h, Funding Rate의 조합이 같은 방향으로 정렬되는지 확인하는 것이 핵심입니다.

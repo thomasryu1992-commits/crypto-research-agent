@@ -15,7 +15,8 @@ def assign_signal_quality(score_row: dict, timeframe: str = "daily") -> dict:
     oi_pct = context.get("oi_change_3_pctile") if timeframe == "daily" else context.get("oi_change_1_pctile")
 
     rsi_overheated = rsi is not None and rsi >= (72 if timeframe == "daily" else 76)
-    oi_overheated = oi_pct is not None and oi_pct >= 0.88
+    rsi_extreme = rsi is not None and rsi >= (78 if timeframe == "daily" else 82)
+    oi_overheated = oi_pct is not None and oi_pct >= (0.88 if timeframe == "daily" else 0.90)
 
     has_etf = abs(etf) > 0.001
     has_exchange = abs(exchange) > 0.001
@@ -78,7 +79,31 @@ def assign_signal_quality(score_row: dict, timeframe: str = "daily") -> dict:
         warnings += 1
         reasons.append("oi_overheated")
 
-    # Grade logic
+    # Timing logic
+    if bias == "Bearish":
+        timing = "Bearish"
+        timing_label = "Downside Pressure"
+    elif bias == "Risk-Off":
+        timing = "Risk-Off"
+        timing_label = "Upside Weakening"
+    elif bias == "Neutral":
+        timing = "Neutral"
+        timing_label = "No Edge"
+    else:
+        if rsi_extreme or (oi_overheated and final_score > 0.25):
+            timing = "Late"
+            timing_label = "Possible Late / Overheated Setup"
+        elif bias == "Constructive" and confirmations >= 2 and warnings <= 2:
+            timing = "Early"
+            timing_label = "Early Upside Candidate"
+        elif bias == "Bullish" and confirmations >= 3 and warnings <= 2:
+            timing = "Confirmed"
+            timing_label = "Confirmed Upside Setup"
+        else:
+            timing = "Neutral"
+            timing_label = "Unclear Timing"
+
+    # Quality logic
     if bias == "Bearish":
         grade = "F"
         label = "Bearish / Downside Pressure"
@@ -87,35 +112,45 @@ def assign_signal_quality(score_row: dict, timeframe: str = "daily") -> dict:
         grade = "D"
         label = "Risk-Off / Upside Weakening"
 
-    elif bias == "Bullish":
-        if confirmations >= 4 and warnings <= 1 and not rsi_overheated and not oi_overheated:
+    elif timing == "Late":
+        grade = "C"
+        label = "Positive but Possibly Late"
+
+    elif timing == "Early":
+        if confirmations >= 4 and warnings <= 1:
             grade = "A"
-            label = "High-Quality Upside Setup"
+            label = "High-Quality Early Upside Setup"
+        elif confirmations >= 3 and warnings <= 2:
+            grade = "B"
+            label = "Constructive Early Upside Setup"
+        else:
+            grade = "C"
+            label = "Early but Incomplete"
+
+    elif timing == "Confirmed":
+        if confirmations >= 4 and warnings <= 1:
+            grade = "A"
+            label = "High-Quality Confirmed Upside Setup"
         elif confirmations >= 3 and warnings <= 2:
             grade = "B"
             label = "Confirmed but Moderate Upside Setup"
         else:
             grade = "C"
-            label = "Weak Bullish Confirmation"
-
-    elif bias == "Constructive":
-        if confirmations >= 3 and warnings <= 1:
-            grade = "B"
-            label = "Early Upside Candidate"
-        elif confirmations >= 2:
-            grade = "C"
-            label = "Constructive but Incomplete"
-        else:
-            grade = "N"
-            label = "Neutral / Weak Edge"
+            label = "Confirmed but Weak"
 
     else:
-        grade = "N"
-        label = "Neutral / No Edge"
+        if bias in ["Bullish", "Constructive"] and final_score > 0:
+            grade = "C"
+            label = "Positive but Unclear"
+        else:
+            grade = "N"
+            label = "Neutral / No Edge"
 
     return {
         "signal_quality": grade,
         "signal_quality_label": label,
+        "signal_timing": timing,
+        "signal_timing_label": timing_label,
         "confirmation_count": confirmations,
         "warning_count": warnings,
         "signal_reasons": "|".join(reasons),

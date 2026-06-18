@@ -1,1 +1,1 @@
-crypto-market-research-agent-v3.6.1-clean
+crypto-market-research-agent-v3.7-signal-timing-calibration

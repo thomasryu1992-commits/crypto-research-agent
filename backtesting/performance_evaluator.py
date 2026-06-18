@@ -63,6 +63,8 @@ def evaluate_backtest(rows: list[dict], primary_window: int) -> dict:
         "bias_summary": _group_summary(valid, primary_window, "bias"),
         "signal_quality_summary": _group_summary(valid, primary_window, "signal_quality"),
         "signal_quality_label_summary": _group_summary(valid, primary_window, "signal_quality_label"),
+        "signal_timing_summary": _group_summary(valid, primary_window, "signal_timing"),
+        "signal_timing_label_summary": _group_summary(valid, primary_window, "signal_timing_label"),
     }
 
 

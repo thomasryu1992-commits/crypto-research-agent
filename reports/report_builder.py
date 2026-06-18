@@ -2,7 +2,7 @@ def build_latest_report(row: dict, timeframe: str) -> str:
     context = row.get("metric_context", {})
 
     report = f"""
-# BTC {timeframe.upper()} Crypto Market Research Report - V3.6
+# BTC {timeframe.upper()} Crypto Market Research Report - V3.7
 
 ## 1. Executive Summary
 Date: {row.get("date")}
@@ -14,6 +14,7 @@ Scenario: {row.get("scenario")}
 Confidence: {row.get("confidence")}
 
 Signal Quality: {row.get("signal_quality")} - {row.get("signal_quality_label")}
+Signal Timing: {row.get("signal_timing")} - {row.get("signal_timing_label")}
 Confirmations: {row.get("confirmation_count")}
 Warnings: {row.get("warning_count")}
 Reasons: {row.get("signal_reasons")}
@@ -60,17 +61,17 @@ Reasons: {row.get("signal_reasons")}
 - Active Addresses: {context.get("active_addresses")}
 - Transaction Count: {context.get("tx_count")}
 
-## 7. Signal Quality Interpretation
-A = High-quality upside setup
-B = Constructive / early upside candidate
-C = Positive but incomplete confirmation
-D = Risk-Off / upside weakening
-F = Bearish / downside pressure
-N = Neutral / no edge
+## 7. Signal Timing Interpretation
+Early = Early upside candidate
+Confirmed = Confirmed trend setup
+Late = Possible late or overheated setup
+Risk-Off = Upside weakening
+Bearish = Downside pressure
+Neutral = No edge
 
 ## 8. Conclusion
-V3.6 separates early upside candidates from confirmed bullish signals.
-Bullish is stricter, while Constructive is treated as a potential early upside signal.
+V3.7 separates signal quality from signal timing.
+This helps identify whether a signal is early, confirmed, late, risk-off, or bearish.
 """
 
     return report.strip()

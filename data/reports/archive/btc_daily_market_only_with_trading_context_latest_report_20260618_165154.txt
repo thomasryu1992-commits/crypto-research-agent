@@ -1,0 +1,164 @@
+# BTC DAILY Crypto Market Research Report - V3.7
+
+## 1. Executive Summary
+Date: 2026-06-17
+BTC Close: 65906.01
+
+Final Score: 0.1854
+Bias: Neutral
+Scenario: Neutral / Wait
+Confidence: Low
+
+Signal Quality: N - Neutral / No Edge
+Signal Timing: Neutral - No Edge
+Confirmations: 3
+Warnings: 0
+Reasons: market_structure_positive|cvd_positive|derivatives_not_negative
+
+## 2. Core Category Scores
+- Market Structure Score: 0.1813
+- Derivatives Positioning Score: 0.35
+- CVD Flow Score: 0.05
+- Volume Score: -0.05
+
+## 3. External Data Scores
+- ETF / Institutional Flow Score: 0.0
+- Exchange Flow Score: 0.0
+- Stablecoin Liquidity Score: 0.0
+- Valuation / Cycle Score: 0.0
+- Network Activity Score: 0.0
+
+## 4. Market Metrics
+- Return 1 Period: 0.35173196014739855
+- Return 3 Periods: 0.24268990949320868
+- Return 7 Periods: 7.145097160686239
+- Return 14 Periods: 2.74896227554945
+- Return 30 Periods: -14.409857838517429
+- RSI: 42.8852720105619
+
+## 5. Positioning / Flow Metrics
+- OI Change 3 Periods: 1.1462021242039329
+- OI Change 7 Periods: 3.365142487657459
+- CVD Change 3 Periods: -17897.049253581557
+- CVD Change 7 Periods: -61502.87149383221
+- Volume Change 3 Periods: -88.59720103060232
+- Volume Change 7 Periods: -88.41588191757754
+
+## 6. External Metrics
+- Total BTC ETF Net Flow: None
+- IBIT Net Flow: None
+- ETF 5D Net Flow: None
+- Exchange Netflow: None
+- Exchange Reserve: None
+- Stablecoin Supply: None
+- Stablecoin Exchange Reserve: None
+- MVRV: None
+- SOPR: None
+- Active Addresses: None
+- Transaction Count: None
+
+## 7. Signal Timing Interpretation
+Early = Early upside candidate
+Confirmed = Confirmed trend setup
+Late = Possible late or overheated setup
+Risk-Off = Upside weakening
+Bearish = Downside pressure
+Neutral = No edge
+
+## 8. Conclusion
+V3.7 separates signal quality from signal timing.
+This helps identify whether a signal is early, confirmed, late, risk-off, or bearish.
+
+---
+
+## 9. Real-Time Trading Context
+
+Source: trading_bot
+Generated At: 2026-06-18 16:51:15
+Asset: BTC
+
+### 9.1 Current Market State
+
+- Trading Bot Market State: Bearish
+- Trading Bot Market Score: -0.5
+- Trading Bot Market Bias: RANGE
+
+### 9.2 Real-Time Key Metrics
+
+- BTC Price: 64,054.90
+- 24H Price Change: -2.3396%
+- Funding Rate: 0
+- Open Interest: 6.42B
+- OI Change 4H: 0.0000%
+- Long/Short Ratio: 1.8345
+- 24H Liquidation: 46.51M
+- 24H Volume: 214,447.84
+
+### 9.3 Risk Flags
+
+None
+
+### 9.4 Evidence Classification
+
+- Bullish Evidence: None
+- Bearish Evidence: None
+- Reset / Uncertain Evidence: None
+
+### 9.5 Real-Time Interpretation
+
+No major real-time derivatives risk flags detected.
+
+### 9.6 Context Overlay
+
+- Existing Research Direction: neutral
+- Trading Context Direction: bearish
+- Overlay Status: Neutral with Bearish Risk
+
+기존 방향성은 중립에 가깝지만 실시간 파생 데이터는 하방 리스크를 보여줍니다. 특히 롱 포지션 쏠림, OI 증가, 청산 증가가 동시에 나타나는지 확인해야 합니다.
+
+### 9.7 Scenario Overlay
+
+Base Scenario:
+Base Scenario: Long/Short Ratio가 높은 상태이므로 시장은 롱 포지션 쏠림 구간입니다. 가격이 지지선 위에 머물면 상승 흐름은 유지될 수 있지만, 지지선 이탈 시 롱 청산 압력이 커질 수 있습니다.
+
+Bullish Scenario:
+Bullish Scenario: 가격이 주요 저항선을 돌파하고 OI가 함께 증가하면서 Funding이 과열되지 않는다면 상승 추세 지속 가능성이 강화됩니다.
+
+Bearish Scenario:
+Bearish Scenario: 가격이 주요 지지선을 이탈하고 OI가 유지되거나 증가한다면 롱 포지션이 물리는 구조가 될 수 있습니다.
+
+### 9.8 Watch Conditions
+
+- 가격 상승 + OI 증가 여부
+- 가격 하락 + OI 증가 시 trapped longs 가능성
+- Funding Rate 과열 여부
+- Long/Short Ratio 추가 상승 여부
+- liquidation_24h 증가 또는 급감 여부
+- 기존 Research Agent 시그널과 Trading Bot context의 정렬 여부
+
+---
+
+## 10. Final Research Summary
+
+### 10.1 Overall View
+
+기존 리서치 방향성은 중립에 가깝지만, 실시간 파생 데이터는 하방 리스크를 보여주고 있습니다. 특히 롱 포지션 쏠림, OI 증가, liquidation_24h 증가 여부가 핵심 확인 포인트입니다.
+
+### 10.2 Conviction
+
+- Conviction Level: Medium
+- Overlay Status: Neutral with Bearish Risk
+- Active Risk Flags: None
+
+### 10.3 Main Risk
+
+뚜렷한 실시간 파생 리스크는 감지되지 않았습니다.
+
+### 10.4 Best Research Action
+
+현재는 명확한 추세 확정보다는 주요 지표의 다음 변화를 확인해야 하는 구간입니다. 가격, OI, Funding, Long/Short Ratio를 함께 추적해야 합니다.
+
+### 10.5 Final Conclusion
+
+현재 리서치 결론은 기존 CSV 기반 Research Agent 결과와 Trading Bot의 실시간 파생 데이터 context를 함께 반영한 것입니다.  
+다음 업데이트에서는 가격 변화, OI 변화, Long/Short Ratio, liquidation_24h, Funding Rate의 조합이 같은 방향으로 정렬되는지 확인하는 것이 핵심입니다.

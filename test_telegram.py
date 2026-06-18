@@ -1,14 +1,13 @@
-import requests
-from config import TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID
+from notifiers.telegram_sender import send_telegram_message
 
-url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
 
-payload = {
-    "chat_id": TELEGRAM_CHAT_ID,
-    "text": "Telegram test message from crypto research agent"
-}
+def main():
+    result = send_telegram_message(
+        "Crypto Research Agent Telegram test message"
+    )
 
-response = requests.post(url, json=payload, timeout=30)
+    print(result)
 
-print("Status Code:", response.status_code)
-print("Response:", response.text)
+
+if __name__ == "__main__":
+    main()

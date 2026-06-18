@@ -215,3 +215,26 @@ Run calibrated ETF backtest:
 ```powershell
 python backtest.py --timeframe daily --csv sample_data/BTCUSDT_1D.csv --extra-csv sample_data/extra_metrics_from_farside.csv --calibration-json sample_data/btc_daily_with_extra_best_calibration.json
 ```
+
+
+---
+
+# V3.7 Signal Timing Calibration
+
+See:
+
+```text
+README_V3_7.md
+```
+
+Run backtest:
+
+```powershell
+python backtest.py --timeframe daily --csv sample_data/BTCUSDT_1D.csv --extra-csv sample_data/extra_metrics_from_farside.csv --calibration-json sample_data/btc_daily_with_extra_best_calibration.json
+```
+
+Analyze signal timing:
+
+```powershell
+python tools/analyze_signal_quality.py --results data/backtests/btc_daily_with_extra_calibrated_backtest_results.csv --window 7
+```
